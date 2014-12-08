@@ -10,14 +10,14 @@ public class ControllableAnimatedSprite extends AnimatedSprite {
 	LinkedList<String> blocks = new LinkedList<String>();
 	public ControllableAnimatedSprite(URL path, int frameWidth, int frameHeight) {
 		super(path, frameWidth, frameHeight);
-		blocks.add("rock.png");
 		blocks.add("box.png");
-		blocks.add("steel.png");
-		blocks.add("dirt.png");
+		blocks.add("box.png");
 	}
 	
 	public void contorl(boolean[] keys, Screen screen)
 	{
+		if (health<=0)
+			screen.destroy(this);
 		this.setAnimationBorder(0, this.currentFrameY, 0, this.currentFrameY);
 		int x= this.x, y= this.y;
 		
@@ -48,7 +48,14 @@ public class ControllableAnimatedSprite extends AnimatedSprite {
 				blockX+=this.width;
 			else blockX-=8;
 			lastBlockTime = System.currentTimeMillis();
-			Sprite block = new Sprite(getClass().getClassLoader().getResource(blocks.getFirst()));
+			String b = blocks.getFirst();
+			int strength = 0;
+			if (b.equals("dirt.png")) strength=50; else 
+				if (b.equals("box.png")) strength=80; else 
+					if (b.equals("rock.png")) strength=120; else 
+						if (b.equals("steel.png")) strength=200; 
+								
+			DestroyableBlock block = new DestroyableBlock(getClass().getClassLoader().getResource(b),strength );
 			blocks.removeFirst();
 			block.setPosition(blockX, blockY);
 			block.setDefaultBoxCollider();
@@ -56,7 +63,7 @@ public class ControllableAnimatedSprite extends AnimatedSprite {
 		}
 		boolean collide = false;
 		for (GameObject s:screen.getSprites())
-			if (s!= this && isCollides(s))	collide = true;
+			if (s!= this && s.getClass()!=Bonus.class && isCollides(s))	collide = true;
 		if (collide){
 				this.setPosition(x,y);
 				
@@ -64,6 +71,9 @@ public class ControllableAnimatedSprite extends AnimatedSprite {
 	//	System.out.println(collide);
 		
 	}
+	public void downHealth(int h){ this.health-=h; }
+
+	public void upHealth(int h){ this.health+=h; if (this.health>100) this.health=100; }
 	
 	public LinkedList<String> getBlocks(){ return blocks;}
 }

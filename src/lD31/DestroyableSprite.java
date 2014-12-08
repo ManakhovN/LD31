@@ -31,13 +31,31 @@ public class DestroyableSprite extends Sprite{
 		createTime=System.currentTimeMillis();
 	}
 
+	public DestroyableSprite(int[][] resource) {
+		super(resource);
+		createTime=System.currentTimeMillis();
+	}
+
+	public void initBombParts() {
+		Random r = new Random();
+		for (int i = 0; i < this.getWidth(); i++)
+			for (int j = 0; j < this.getHeight(); j++) {
+				Part p = new Part(i, j, 1, 1);
+				p.setVelocityVector((float) (r.nextFloat() - 0.5)/8f,
+							        (float) (r.nextFloat() - 1  )/8f);
+				p.setAccelerationVector(0, 0);
+				parts.add(p);
+			}
+
+	}
+	
 	public void initParts() {
 		Random r = new Random();
 		for (int i = 0; i < this.getWidth(); i++)
 			for (int j = 0; j < this.getHeight(); j++) {
 				Part p = new Part(i, j, 1, 1);
 				p.setVelocityVector((float) (r.nextFloat() - 0.5),
-						(float) (r.nextFloat() - 0.5));
+							        (float) (r.nextFloat() - 0.5));
 				parts.add(p);
 			}
 
@@ -46,7 +64,7 @@ public class DestroyableSprite extends Sprite{
 	public boolean isTimeOut()
 	{
 		if (lifeTime==-1) return false;
-		else return System.currentTimeMillis() - createTime<lifeTime;
+		else return System.currentTimeMillis() - createTime>lifeTime;
 	}
 	
 	public void initParts(int countW, int countH) {

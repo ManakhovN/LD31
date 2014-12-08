@@ -49,19 +49,59 @@ public class Screen extends BufferedImage{
 
 		for (int i=0; i<sprites.size(); i++){
 			
-			if (sprites.get(i).getClass()==Sprite.class || sprites.get(i).getClass() == AnimatedSprite.class || sprites.get(i).getClass()== ControllableAnimatedSprite.class)
+			if (sprites.get(i).getClass()== DestroyableBlock.class)
+				{if (((DestroyableBlock)sprites.get(i)).getHealth()<0) this.destroy(i, 800);}
+				else 
+			if (sprites.get(i).getClass()== Bonus.class){
+				if (((Bonus)sprites.get(i)).landing()) {   this.deleteSprite(i); i--; continue;	}
+			} else 
+				if (sprites.get(i).getClass()== ShurikenThrower.class)
+					((ShurikenThrower)sprites.get(i)).update(this);
+				else 
+					if (sprites.get(i).getClass()== Bomb.class)
+						((Bomb)sprites.get(i)).update(this);
+				else 
+					if (sprites.get(i).getClass()== Spider.class)
+						((Spider)sprites.get(i)).update(this);
+			
+			if (sprites.get(i).getClass()!=DestroyableSprite.class && sprites.get(i).getClass()!=GameObject.class )
 			{
 				Sprite currentSprite = (Sprite) sprites.get(i);
-				if (currentSprite.getClass() == AnimatedSprite.class || currentSprite.getClass() == ControllableAnimatedSprite.class)
+				if (currentSprite.getClass()==Laser.class)
+				{
+					Laser l =(Laser)currentSprite;
+					l.findLaserEnding(this);
+					if (l.currentFrameY==2) 
+						for (int j=currentSprite.getX()+currentSprite.getWidth()/2; j<l.getLaserX(); j++)
+							this.setRGB(j, l.getLaserY(), 0xFFFF0000);
+					
+					if (l.currentFrameY==3) 
+						for (int j=l.getLaserX(); j<currentSprite.getX()+currentSprite.getWidth()/2; j++)
+							this.setRGB(j, l.getLaserY(), 0xFFFF0000);
+					
+					if (l.currentFrameY==1) 
+						for (int j=currentSprite.getY()+currentSprite.getHeight()/2; j<l.getLaserY(); j++)
+							this.setRGB(l.getLaserX(), j, 0xFFFF0000);
+					
+					if (l.currentFrameY==0) 
+						for (int j=l.getLaserY(); j<currentSprite.getY()+currentSprite.getHeight()/2; j++)
+							this.setRGB(l.getLaserX(), j, 0xFFFF0000);
+					
+					
+				}
+				
+				if (currentSprite.getClass() != Sprite.class && currentSprite.getClass() != DestroyableBlock.class && currentSprite.getClass() != Bonus.class)
 				{
 					((AnimatedSprite)currentSprite).nextFrame();
 				}
+					
 					for (int ii=0; ii<currentSprite.getWidth(); ii++)
 						for (int jj = 0; jj<currentSprite.getHeight(); jj++)
 						 if (currentSprite.get(ii, jj)!=0xFFFF00FF &&
 							 ii + currentSprite.getX()>=0 && ii+currentSprite.getX()<this.getWidth() &&
 							 jj + currentSprite.getY()>=0 && jj+currentSprite.getY()<this.getHeight())
-							this.setRGB(ii+currentSprite.getX(), jj+currentSprite.getY(), currentSprite.get(ii, jj));
+							this.setRGB(ii+currentSprite.getX(), jj+currentSprite.getY(), currentSprite.get(ii, jj)&currentSprite.getMask());
+					if (currentSprite.getClass() == ControllableAnimatedSprite.class) currentSprite.useMask(0xFFFFFFFF);
 			} else
 			if (sprites.get(i).getClass()==DestroyableSprite.class)
 			{
@@ -84,7 +124,7 @@ public class Screen extends BufferedImage{
 							{
 								this.setRGB((int)(currentPart.getPartX()+ii+currentSprite.getX()),
 											(int)(currentPart.getPartY()+jj+currentSprite.getY()),
-											currentSprite.get(currentPart.getX()+ii, currentPart.getY()+jj));
+											currentSprite.get(currentPart.getX()+ii, currentPart.getY()+jj) &currentSprite.getMask());
 							}
 						currentPart.move();
 					}
@@ -120,14 +160,53 @@ public class Screen extends BufferedImage{
 		if (sprites.size()>index)
 			sprites.remove(index);
 	}
+	
+	public void deleteSprite(GameObject obj)
+	{
+		int index = this.sprites.indexOf(obj);
+		if (index!=-1)
+			sprites.remove(index);
+	}
 
 	public void destroy(int i)
 	{
 		DestroyableSprite spr = new DestroyableSprite((Sprite)this.sprites.get(i));
+		spr.setLifeTime(1000);
 		spr.initParts();
 		this.sprites.remove(i);
 		this.sprites.add(i,spr);
 	}
+	public void destroy(int i, int lifetime)
+	{
+		DestroyableSprite spr = new DestroyableSprite((Sprite)this.sprites.get(i));
+		spr.setLifeTime(lifetime);
+		spr.initParts();
+		this.sprites.remove(i);
+		this.sprites.add(i,spr);
+	}
+	
+	public void destroy(GameObject obj, int lifetime)
+	{
+		int i = this.sprites.indexOf(obj);
+		if (i!=-1){
+			DestroyableSprite spr = new DestroyableSprite((Sprite)this.sprites.get(i));
+			spr.setLifeTime(lifetime);
+			spr.initParts();
+			this.sprites.remove(i);
+			this.sprites.add(i,spr);
+		}
+	}
+	public void destroy(GameObject obj)
+	{
+		int i = this.sprites.indexOf(obj);
+		if (i!=-1){
+			DestroyableSprite spr = new DestroyableSprite((Sprite)this.sprites.get(i));
+			spr.initParts();
+			this.sprites.remove(i);
+			this.sprites.add(i,spr);
+		}
+	}
+	
 	
 	public void recover(int i)
 	{

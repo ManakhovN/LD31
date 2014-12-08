@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 public class Sprite extends GameObject{
 	int[][] img;
-
+	int mask=0xFFFFFFFF;
 	public Sprite(URL path) {
 		super(0, 0);
 		BufferedImage temp = null;
@@ -24,13 +24,10 @@ public class Sprite extends GameObject{
 				img[i][j] = temp.getRGB(i, j);
 	}
 
-	public void useMask(int mask) {
-		for (int i = 0; i < this.width; i++)
-			for (int j = 0; j < this.height; j++)
-				if (img[i][j] != 0xFFFF00FF)
-					img[i][j] &= mask;
-	}
-
+	public void useMask(int mask) {	this.mask =  mask; }
+	
+	public int getMask(){ return this.mask; }
+	
 	public Sprite(int[][] arr) {
 		super(0, 0);
 		this.img = arr;

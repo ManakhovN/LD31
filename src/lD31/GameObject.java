@@ -17,7 +17,7 @@ public class GameObject extends Object {
 	
 	public boolean isCollides(GameObject object)
 	{
-		if (collider == null || object.getCollider()==null) return false;
+		if (object==null || collider == null || object.getCollider()==null) return false;
 		int x1 = this.x+collider.getX();
 		int y1 = this.y+collider.getY();
 		int x2 = object.getX() + object.getCollider().getX();
@@ -55,6 +55,7 @@ public class GameObject extends Object {
 	
 	public boolean isCollides(int x, int y)
 	{
+		if (collider ==null) return false;
 		int x1 = this.x+collider.getX();
 		int y1 = this.y+collider.getY();
 		if (collider == null) return false;
@@ -71,4 +72,5 @@ public class GameObject extends Object {
 	public void moveX(int delta) {	this.x += delta; }
 
 	public void moveY(int delta) {	this.y += delta; }
+	
 }

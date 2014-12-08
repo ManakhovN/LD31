@@ -2,7 +2,6 @@ package lD31;
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Canvas;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Toolkit;
@@ -11,7 +10,6 @@ import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
-
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 
@@ -22,7 +20,8 @@ public class game extends Canvas implements Runnable{
 	static int HEIGHT = 320;
 	Screen screen,sideBar;
 	Sprite[] blocks = new Sprite[5];
-	
+	BonusSpawner bonusSpawner = new BonusSpawner(10000);
+	Spawner spawner = new Spawner();
 	ControllableAnimatedSprite player;
 	public static boolean[] key = new boolean[32767];
 	
@@ -30,19 +29,33 @@ public class game extends Canvas implements Runnable{
 		long lastTime = System.currentTimeMillis();
 		long delta = System.currentTimeMillis() - lastTime;
 		init();
-		render();
+		render();	
+		while(!key[KeyEvent.VK_SPACE])
 		showScreen(getClass().getClassLoader().getResource("startScreen.png"));
+		lastTime = System.currentTimeMillis();
+		delta = System.currentTimeMillis() - lastTime;
+		while (delta<200){
+			delta = System.currentTimeMillis() - lastTime;
+		}
+		while(!key[KeyEvent.VK_SPACE])
 		showScreen(getClass().getClassLoader().getResource("controlScreen.png"));
-		while(true)
+		lastTime = System.currentTimeMillis();
+		delta = System.currentTimeMillis() - lastTime;
+		while (delta<200){
+			delta = System.currentTimeMillis() - lastTime;
+		}
+		while(player.health>0)
 		{
 			delta = System.currentTimeMillis() - lastTime;
 			if (delta>=15)
 			{
 				lastTime = System.currentTimeMillis();
-//				System.out.println(1000/delta);
 				render();
 			}
 		}
+		while(!key[KeyEvent.VK_SPACE])
+			showScreen(getClass().getClassLoader().getResource("gameOver.png"));
+		System.exit(0);
 	}
 	
 	private void render() {
@@ -56,6 +69,8 @@ public class game extends Canvas implements Runnable{
 		Graphics g = bs.getDrawGraphics();
 		screen.render();
 		updateSideBar();
+		bonusSpawner.update(screen, player);
+		spawner.update(screen);
 		player.contorl(key,screen);
 		g.drawImage(screen,0,0,HEIGHT+10, HEIGHT+10, null);
 		g.drawImage(sideBar, HEIGHT+10,0,(int) ((HEIGHT+10)/2.5),HEIGHT+10,null);
@@ -100,10 +115,6 @@ public class game extends Canvas implements Runnable{
 		bs.show();		
 		long lastTime = System.currentTimeMillis();
 		long delta = System.currentTimeMillis() - lastTime;
-		while (delta<200){
-			delta = System.currentTimeMillis() - lastTime;
-		}
-		while(!key[KeyEvent.VK_SPACE]);
 	}
 
 	
@@ -148,7 +159,7 @@ public class game extends Canvas implements Runnable{
 		GameObject BotBorder = new GameObject(0, 72, 80, 8);
 		BotBorder.setDefaultBoxCollider();
 		screen.addGameObject(BotBorder);
-		
+
 	}
 
 	private void start() {
