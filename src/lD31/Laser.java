@@ -14,18 +14,9 @@ public class Laser extends AnimatedSprite{
 	
 	public void findLaserEnding(Screen screen)
 	{
-		if (this.x<8)
-			this.setAnimationBorder(0, 2, 3, 2); 
-		if (this.x>screen.getWidth()-10)
-			this.setAnimationBorder(0, 3, 3, 3); 
-		if (this.y<8)
-			this.setAnimationBorder(0, 1, 3, 1); 
-		if (this.y>screen.getHeight()-15)
-			this.setAnimationBorder(0, 0, 3, 0);
 		if (System.currentTimeMillis() - lastShoot>shootCoolDown)
 			lastShoot = System.currentTimeMillis();
 		if (System.currentTimeMillis() - lastShoot<shootingTime){
-				this.setAnimationBorder(0, this.currentFrameY, 3, this.currentFrameY);
 				boolean horizontal= this.currentFrameY>1;
 				if (this.currentFrameY==2)
 				laserX=this.x+100; 
@@ -70,8 +61,8 @@ public class Laser extends AnimatedSprite{
 				this.setAnimationBorder(0, 1, 3, 1); 
 			if (this.y>screen.getHeight()-10)
 				this.setAnimationBorder(0, 0, 3, 0); 
-			laserX=this.x;
-			laserY=this.y;
+			laserX=this.x+this.width/2;
+			laserY=this.y+this.height/2;
 		}
 	}
 	
